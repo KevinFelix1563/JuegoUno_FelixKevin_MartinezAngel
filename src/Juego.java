@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Scanner;
 
@@ -36,16 +37,13 @@ public class Juego {
     }
     private void inicializarMazo() {
         String[] colors = {"blue", "yellow", "red", "green"};
-        for (String color : colors) {
-            // Añadir una sola carta 0 de cada color
-            mazo.add(new Carta(0, color,0,0));
-
-            // Añadir cartas 1-12, dos veces de cada número por color
+        Arrays.stream(colors).forEach(color -> {
+            mazo.add(new Carta(0, color, 0, 0));
             for (int num = 1; num <= 12; num++) {
-                mazo.add(new Carta(num, color,0,0));
-                mazo.add(new Carta(num, color,0,0));
+                mazo.add(new Carta(num, color, 0, 0));
+                mazo.add(new Carta(num, color, 0, 0));
             }
-        }
+        });
         // Añadir 4 cartas +4 y 4 de cambio de color (sin color específico)
         for (int i = 0; i < 4; i++) {
             mazo.add(new Carta(13, "blank",0,0)); // +4
@@ -72,19 +70,14 @@ public class Juego {
     }
     //--------------------------------------------------------------------------
     public boolean puedeJugar(){
-        Carta cartaJugador;
-        Carta cartaComparar = cartas.getLast();
-        Jugador jugador;
+            Carta cartaComparar = cartas.get(cartas.size() - 1);
+            Jugador jugador = turno ? player1 : player2;
 
-        if(turno){jugador = player1;}
-        else{jugador = player2;}
-
-        for(int i = 0; i < jugador.getCantidadCartas();i++){
-            cartaJugador = jugador.getMano().get(i);
-            if(cartaJugador.getNumero() == cartaComparar.getNumero()||cartaJugador.getColor().equals(cartaComparar.getColor())){return true;}
-            if(cartaJugador.getNumero() == 13||cartaJugador.getNumero() == 14){return true;}
-        }
-        return false;
+            return jugador.getMano().stream().anyMatch(cartaJugador ->
+                    cartaJugador.getNumero() == cartaComparar.getNumero() ||
+                            cartaJugador.getColor().equals(cartaComparar.getColor()) ||
+                            cartaJugador.getNumero() == 13 || cartaJugador.getNumero() == 14
+            );
     }
 
     public boolean validarCarta(Carta cartaJugador){
